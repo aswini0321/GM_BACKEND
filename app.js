@@ -144,6 +144,51 @@ app.get('/category-c', async (req, res) => {
   }
 });
 // Export specific category data to Excel with flattened column names and without photos
+// app.get('/export/:category', async (req, res) => {
+//   try {
+//     const { category } = req.params;
+//     let data = [];
+
+//     let model;
+//     if (category === 'a') model = CategoryA;
+//     else if (category === 'b') model = CategoryB;
+//     else if (category === 'c') model = CategoryC;
+//     else return res.status(400).json({ success: false, message: 'Invalid category' });
+
+//     const rawData = await model.find();
+
+//     // Flatten and exclude 'photos' field
+//     data = rawData.map(doc => {
+//       const obj = doc.toObject();
+//       delete obj.photos;  // Remove photos from export
+
+//       // Flatten the object keys
+//       return {
+//         'Mandal': obj.mandal,
+//         'Gram Panchayat': obj.gramPanchayat,
+//         'Property Description': obj.propertyDetails.description,
+//         'Survey No': obj.propertyDetails.surveyNo,
+//         'Extent': obj.propertyDetails.extent,
+//         'Boundaries': obj.propertyDetails.boundaries,
+//         'Possession Type': obj.possessionDetails.type,
+//         'Ownership Details': obj.possessionDetails.ownershipDetails,
+//         'Layout No': obj.possessionDetails.layoutNo,
+//         'Encroachment Identified': obj.encroachmentDetails.identified,
+//         'Encroachment Action Taken': obj.encroachmentDetails.actionTaken,
+//         'Remarks': obj.remarks
+//       };
+//     });
+
+//     const xls = json2xls(data);
+//     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+//     res.setHeader('Content-Disposition', `attachment; filename=category_${category.toUpperCase()}_data.xlsx`);
+//     res.end(xls, 'binary');
+//   } catch (error) {
+//     console.error('Export error:', error);
+//     res.status(500).json({ success: false, message: 'Failed to export data.' });
+//   }
+// });
+// Export specific category data to Excel with flattened column names and without photos
 app.get('/export/:category', async (req, res) => {
   try {
     const { category } = req.params;
@@ -157,13 +202,11 @@ app.get('/export/:category', async (req, res) => {
 
     const rawData = await model.find();
 
-    // Flatten and exclude 'photos' field
     data = rawData.map(doc => {
       const obj = doc.toObject();
-      delete obj.photos;  // Remove photos from export
+      delete obj.photos; // Exclude photos
 
-      // Flatten the object keys
-      return {
+      const commonFields = {
         'Mandal': obj.mandal,
         'Gram Panchayat': obj.gramPanchayat,
         'Property Description': obj.propertyDetails.description,
@@ -171,12 +214,30 @@ app.get('/export/:category', async (req, res) => {
         'Extent': obj.propertyDetails.extent,
         'Boundaries': obj.propertyDetails.boundaries,
         'Possession Type': obj.possessionDetails.type,
-        'Ownership Details': obj.possessionDetails.ownershipDetails,
-        'Layout No': obj.possessionDetails.layoutNo,
         'Encroachment Identified': obj.encroachmentDetails.identified,
         'Encroachment Action Taken': obj.encroachmentDetails.actionTaken,
         'Remarks': obj.remarks
       };
+
+      if (category === 'a') {
+        return {
+          ...commonFields,
+          'Ownership Details': obj.possessionDetails.ownershipDetails,
+          'Layout No': obj.possessionDetails.layoutNo
+        };
+      } else if (category === 'b') {
+        return {
+          ...commonFields,
+          'Gifted Details': obj.possessionDetails.giftDetails,
+          'Gifted By Whom': obj.possessionDetails.byWhom
+        };
+      } else if (category === 'c') {
+        return {
+          ...commonFields,
+          'Vested Details': obj.possessionDetails.vestedDetails,
+          'Under Whom': obj.possessionDetails.underWhom
+        };
+      }
     });
 
     const xls = json2xls(data);
@@ -188,6 +249,7 @@ app.get('/export/:category', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to export data.' });
   }
 });
+
 
 // Export Data to Excel
 app.get('/export', async (req, res) => {
