@@ -11,17 +11,25 @@ const CategoryCSchema = new mongoose.Schema({
   },
   possessionDetails: {
     type: { type: String },
-    ownershipDetails: { type: String },
-    layoutNo: { type: String },
+    vestedDetails: { type: String },
+    underWhom: { type: String },
   },
   encroachmentDetails: {
-    identified: Boolean,
+    identified: String,
     actionTaken: String,
   },
   photos: {
-    beforePhoto: String,
-    afterPhoto: String,
-  },
+    beforePhoto: {
+      lat: String,
+      lon: String,
+      photoUrl: String,
+    },
+    afterPhoto: {
+      lat: String,
+      lon: String,
+      photoUrl: String,
+    },
+   },
   remarks: String,
 });
 

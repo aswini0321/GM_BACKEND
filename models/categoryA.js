@@ -15,13 +15,21 @@ const CategoryASchema = new mongoose.Schema({
     layoutNo: { type: String },
   },
   encroachmentDetails: {
-    identified: Boolean,
+    identified: String,
     actionTaken: String,
   },
   photos: {
-    beforePhoto: String,
-    afterPhoto: String,
-  },
+     beforePhoto: {
+       lat: String,
+       lon: String,
+       photoUrl: String,
+     },
+     afterPhoto: {
+       lat: String,
+       lon: String,
+       photoUrl: String,
+     },
+    },
   remarks: String,
 });
 

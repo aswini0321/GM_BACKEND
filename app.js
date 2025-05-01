@@ -6,9 +6,12 @@ const bodyParser = require('body-parser');
 const json2xls = require('json2xls');
 const ExcelJS = require('exceljs');
 const app = express();
+const CategoryA = require('./models/categoryA');  // Importing CategoryA model
+const CategoryB = require('./models/categoryB');  // Importing CategoryB model
+const CategoryC = require('./models/categoryC');  // Importing CategoryC model
 
 // Middleware
-// app.use(cors());
+
 const allowedOrigins = [
   'https://gm-frontend-do56.vercel.app',
   'http://localhost:3000'
@@ -27,7 +30,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
   credentials: true
 }));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -39,43 +41,6 @@ mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
-// Define Schema for Categories A, B, and C
-const categorySchema = new mongoose.Schema({
-  mandal: String,
-  gramPanchayat: String,
-  propertyDetails: {
-    description: String,
-    surveyNo: String,
-    extent: String,
-    boundaries: String,
-  },
-  possessionDetails: {
-    type: { type: String },  // 'Owned' / 'Gifted' / 'Vested' / 'Others'
-    ownershipDetails: { type: String },  // How it is owned by the Panchayat
-    layoutNo: { type: String },  // If through Layout, specify layout number
-  },
-  encroachmentDetails: {
-    identified: Boolean,
-    actionTaken: String,
-  },
-  photos: {
-    beforePhoto: {
-      lat: String,
-      lon: String,
-      photoUrl: String,
-    },
-    afterPhoto: {
-      lat: String,
-      lon: String,
-      photoUrl: String,
-    },
-  },
-  remarks: String,
-});
-
-const CategoryA = mongoose.model('CategoryA', categorySchema);
-const CategoryB = mongoose.model('CategoryB', categorySchema);
-const CategoryC = mongoose.model('CategoryC', categorySchema);
 
 // Create Route for Category A
 app.post('/category-a', async (req, res) => {
